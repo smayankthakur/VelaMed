@@ -1,0 +1,6 @@
+# VelaMed — target list for batch scanning.
+# One site per line. Lines starting with # are ignored.
+# Replace these with the 10–15 Delhi NCR nursing homes you want to check.
+
+github.com
+example.com

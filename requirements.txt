@@ -1,0 +1,8 @@
+# Milestone 1 (passive engine) uses the Python standard library only —
+# nothing to install yet.
+#
+# Pinned here as they come in on later milestones:
+#   M2  report   : reportlab or weasyprint   (PDF)
+#   M3  AI       : openai / an SDK for your chosen India-hosted model
+#   M3b forms    : playwright                 (render pages, find consent on forms)
+#   M4  API      : fastapi, uvicorn
