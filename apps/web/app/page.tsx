@@ -59,11 +59,27 @@ export default function Home() {
     }
   }
 
-  function submitEmail(e: React.FormEvent) {
+  async function submitEmail(e: React.FormEvent) {
     e.preventDefault();
-    // Lead capture: wired to storage in M6. For now, record intent client-side
-    // and reveal the report link.
-    if (email.trim()) setEmailDone(true);
+    if (!email.trim() || !result) return;
+    // Persist the lead (best-effort) — never block the report on it.
+    try {
+      await fetch(`${API}/lead`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          scan_id: result.id,
+          host: result.host,
+          score: result.score,
+          max: result.max,
+          band: result.band,
+        }),
+      });
+    } catch {
+      /* ignore — show the report regardless */
+    }
+    setEmailDone(true);
   }
 
   const groups = result ? Array.from(new Set(result.scoring.items.map((i) => i.group))) : [];

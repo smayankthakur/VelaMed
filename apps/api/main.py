@@ -15,8 +15,10 @@ Run it:
     uvicorn main:app --reload --port 8000
 """
 
+import json
 import os
 import sys
+import urllib.request
 import uuid
 
 from fastapi import FastAPI, HTTPException
@@ -43,13 +45,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory store: id -> {"result": ..., "scoring": ...}. Replace with a DB later.
+# In-memory store: id -> {"result": ..., "scoring": ...}. Scans are ephemeral;
+# leads are persisted to Supabase (see /lead).
 STORE: dict = {}
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
 
 class ScanRequest(BaseModel):
     url: str
     timeout: int = 10
+
+
+class LeadRequest(BaseModel):
+    email: str
+    scan_id: str | None = None
+    host: str | None = None
+    score: int | None = None
+    max: int | None = None
+    band: str | None = None
 
 
 @app.get("/health")
@@ -75,6 +90,38 @@ def run_scan(req: ScanRequest):
         "scoring": scoring,
         "checks": result["checks"],
     }
+
+
+@app.post("/lead")
+def capture_lead(req: LeadRequest):
+    """Persist a lead to Supabase. Best-effort: a storage failure never blocks
+    the user from seeing their report (the front end reveals it regardless)."""
+    email = (req.email or "").strip()
+    if "@" not in email or "." not in email.split("@")[-1]:
+        raise HTTPException(status_code=400, detail="a valid email is required")
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return {"stored": False, "detail": "lead storage not configured"}
+
+    row = {
+        "email": email, "scan_id": req.scan_id, "host": req.host,
+        "score": req.score, "max_score": req.max, "band": req.band,
+    }
+    try:
+        r = urllib.request.Request(
+            f"{SUPABASE_URL}/rest/v1/velamed_leads",
+            data=json.dumps(row).encode(),
+            method="POST",
+            headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "return=minimal",
+            },
+        )
+        urllib.request.urlopen(r, timeout=10)
+        return {"stored": True}
+    except Exception as e:
+        return {"stored": False, "detail": str(e)[:160]}
 
 
 def _get(scan_id: str):
