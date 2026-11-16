@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://velamed-api.onrender.com";
 
@@ -147,7 +148,14 @@ export default function Home() {
                   />
                   <button type="submit">Email me the report</button>
                 </form>
-              ) : (
+              ) : null}
+              {!emailDone && (
+                <p className="disclaimer" style={{ marginTop: 8 }}>
+                  We use your email only to send this report. See our{" "}
+                  <Link href="/privacy">Privacy Policy</Link>.
+                </p>
+              )}
+              {emailDone && (
                 <a className="btn" href={`${API}/scan/${result.id}/report.pdf`} target="_blank" rel="noreferrer">
                   Download the PDF report
                 </a>
@@ -164,6 +172,8 @@ export default function Home() {
 
       <footer className="foot">
         VelaMed — a Sitelytc Digital Media Pvt. Ltd. service. Passive checks only.
+        <br />
+        <Link href="/privacy">Privacy Policy</Link>
       </footer>
     </>
   );
