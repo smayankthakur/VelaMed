@@ -16,6 +16,7 @@ velamed/
 │   ├── checks.py      individual passive checks
 │   ├── engine.py      scan() — runs the checks, returns JSON
 │   ├── dpdp.py        DPDP checks: privacy policy + form consent
+│   ├── render.py      optional Playwright rendering for JS-loaded forms
 │   ├── scoring.py     0–40 rubric (Security 24 / DPDP 16)
 │   ├── report.py      console / batch rendering
 │   ├── report_html.py one-page print-ready HTML report
@@ -70,8 +71,8 @@ send to a model; **patient data is not** — keep it off free tiers.
 - **M1** passive engine — done
 - **M2** scoring (0–40) + one-page HTML/PDF report — done
 - **M3** DPDP checks: privacy-policy reader + form consent — done
-- **M3b** JS-rendered form consent via Playwright (for sites whose forms load via JS)
-- **M4** FastAPI wrapper — done (see `apps/api/`)
+- **M3b** JS-rendered form consent via Playwright — done (optional; static fallback)
+- **M4** FastAPI wrapper — done (see `apps/api/`; live on Render)
 - **M5** Next.js front end → **M6** deploy free tier
 - Paid tier (ownership gate + scanner worker + billing) — separate sprint
 

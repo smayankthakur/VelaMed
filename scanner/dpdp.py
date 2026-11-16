@@ -210,18 +210,41 @@ def check_privacy_policy(url: str, timeout: int = DEFAULT_TIMEOUT, analyzer=None
     }
 
 
-def check_form_consent(url: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
-    """Do forms collecting personal data offer consent?"""
+def check_form_consent(url: str, timeout: int = DEFAULT_TIMEOUT, use_render: bool = True) -> dict:
+    """Do forms collecting personal data offer consent?
+
+    First reads the static HTML (fast). If that finds no personal-data form and
+    rendering is available, loads the page in a headless browser (Playwright) to
+    catch forms injected by JavaScript. Falls back silently if Playwright is absent.
+    """
     home = _fetch_text(url, timeout)
     if home is None:
         return {"pass": None, "detail": "Could not load the site to inspect forms"}
 
     r = analyze_form_html(home)
+    rendered = False
+
+    if not r["collects_personal_data"] and use_render:
+        try:
+            from .render import render_html
+            r2 = analyze_form_html(render_html(url, timeout))
+            if r2["collects_personal_data"]:
+                r, rendered = r2, True
+        except Exception:
+            pass  # rendering unavailable → keep the static result
+
+    r["rendered"] = rendered
+    tag = " (JS-rendered)" if rendered else ""
+
     if not r["collects_personal_data"]:
-        return {"pass": None, "detail": "No personal-data form found on the homepage",
-                "collects_personal_data": False, "consent_offered": None}
+        note = "No personal-data form found on the homepage"
+        if not rendered and use_render:
+            note += " (static read; a form may load via JavaScript)"
+        return {"pass": None, "detail": note,
+                "collects_personal_data": False, "consent_offered": None, "rendered": rendered}
     if r["consent_offered"]:
-        return {"pass": True, "detail": "Form collects personal data and offers consent / a privacy link", **r}
+        return {"pass": True,
+                "detail": f"Form collects personal data and offers consent / a privacy link{tag}", **r}
     return {"pass": False,
-            "detail": "Form collects personal data (name/phone/email) with no visible consent or privacy link",
+            "detail": f"Form collects personal data (name/phone/email) with no visible consent or privacy link{tag}",
             **r}

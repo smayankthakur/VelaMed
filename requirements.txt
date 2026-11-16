@@ -4,7 +4,12 @@
 
 reportlab>=4.0        # M2: generated one-page PDF report
 
+# Optional: JS rendering for form-consent on sites whose forms load via
+# JavaScript (M3b). Without it, the form check falls back to static HTML.
+#   pip install playwright
+#   playwright install chromium
+playwright>=1.40      # optional — comment out to skip
+
 # Coming on later milestones:
-#   M3  AI    : openai / an SDK for your chosen India-hosted model
-#   M3b forms : playwright    (render pages, find consent on forms)
-#   M4  API   : fastapi, uvicorn
+#   M3  AI    : an SDK for your chosen India-hosted model (policy reader upgrade)
+#   M4  API   : fastapi, uvicorn  (see apps/api/requirements.txt)
