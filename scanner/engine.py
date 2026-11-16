@@ -5,10 +5,14 @@ scan(url) runs every registered passive check and returns one result dict.
 This JSON is the contract every later layer builds on (scoring, report, API).
 """
 
+import re
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 from . import checks, dpdp
+
+# A hostname: dot-separated labels, no spaces. Good enough to reject junk input.
+_HOST_RE = re.compile(r"^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))+$")
 
 SCANNER_VERSION = "velamed-passive/0.2 (milestone-3)"
 
@@ -27,8 +31,8 @@ def hostname_of(url: str) -> str:
 def scan(url: str, timeout: int = checks.DEFAULT_TIMEOUT) -> dict:
     url = normalize(url)
     host = hostname_of(url)
-    if not host:
-        raise ValueError(f"Could not parse a hostname from: {url}")
+    if not host or not _HOST_RE.match(host):
+        raise ValueError(f"Not a valid hostname: {url}")
 
     return {
         "target": url,

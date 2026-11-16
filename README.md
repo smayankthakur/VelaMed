@@ -20,7 +20,8 @@ velamed/
 │   ├── report.py      console / batch rendering
 │   ├── report_html.py one-page print-ready HTML report
 │   └── report_pdf.py  one-page PDF report (reportlab)
-├── apps/              (later) api/ FastAPI · web/ Next.js
+├── apps/
+│   └── api/           FastAPI wrapper over the scanner (M4)
 └── reports/           (generated; git-ignored)
 ```
 
@@ -70,8 +71,15 @@ send to a model; **patient data is not** — keep it off free tiers.
 - **M2** scoring (0–40) + one-page HTML/PDF report — done
 - **M3** DPDP checks: privacy-policy reader + form consent — done
 - **M3b** JS-rendered form consent via Playwright (for sites whose forms load via JS)
-- **M4** FastAPI wrapper → **M5** Next.js front end → **M6** deploy free tier
+- **M4** FastAPI wrapper — done (see `apps/api/`)
+- **M5** Next.js front end → **M6** deploy free tier
 - Paid tier (ownership gate + scanner worker + billing) — separate sprint
+
+## API
+
+A thin HTTP layer lives in `apps/api/` — `POST /scan` returns the score and
+checks, with `/scan/{id}/report.html` and `.pdf` for the one-pager. See
+`apps/api/README.md`.
 
 ## Add a check
 
