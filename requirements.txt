@@ -1,8 +1,10 @@
-# Milestone 1 (passive engine) uses the Python standard library only —
-# nothing to install yet.
-#
-# Pinned here as they come in on later milestones:
-#   M2  report   : reportlab or weasyprint   (PDF)
-#   M3  AI       : openai / an SDK for your chosen India-hosted model
-#   M3b forms    : playwright                 (render pages, find consent on forms)
-#   M4  API      : fastapi, uvicorn
+# The passive engine (M1) and HTML report use the standard library only.
+# The PDF report (M2) needs reportlab. The HTML report works without it and
+# prints to PDF from any browser, so reportlab is optional.
+
+reportlab>=4.0        # M2: generated one-page PDF report
+
+# Coming on later milestones:
+#   M3  AI    : openai / an SDK for your chosen India-hosted model
+#   M3b forms : playwright    (render pages, find consent on forms)
+#   M4  API   : fastapi, uvicorn

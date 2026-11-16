@@ -15,21 +15,30 @@ velamed/
 ├── scanner/           the passive engine (the product's core)
 │   ├── checks.py      individual passive checks
 │   ├── engine.py      scan() — runs the checks, returns JSON
-│   └── report.py      human-readable rendering
+│   ├── scoring.py     0–40 rubric → score, band, breakdown
+│   ├── report.py      console / batch rendering
+│   ├── report_html.py one-page print-ready HTML report
+│   └── report_pdf.py  one-page PDF report (reportlab)
 ├── apps/              (later) api/ FastAPI · web/ Next.js
 └── reports/           (generated; git-ignored)
 ```
 
 ## Run it
 
-No dependencies — Python 3.9+ standard library only.
+The scanner and HTML report need only the Python 3.9+ standard library.
+The PDF report needs reportlab (`pip install -r requirements.txt`).
 
 ```bash
-python3 scan.py yourhospital.com            # readable report
-python3 scan.py yourhospital.com --json     # raw JSON (the API contract)
-python3 scan.py --batch sites.txt           # one line per site
-python3 scan.py --batch sites.txt --json    # JSON array
+python3 scan.py yourhospital.com                 # report + 0–40 score
+python3 scan.py yourhospital.com --json          # raw JSON (the API contract)
+python3 scan.py yourhospital.com --report pdf    # one-page PDF -> reports/
+python3 scan.py yourhospital.com --report both   # HTML + PDF
+python3 scan.py --batch sites.txt                # one scored line per site
+python3 scan.py --batch sites.txt --report html  # a report per site
 ```
+
+Reports land in `reports/` (git-ignored). Without reportlab, `--report pdf`
+falls back to HTML, which prints to PDF from any browser.
 
 > Run it on a normal machine, not behind a TLS-intercepting proxy, or the
 > certificate and header readings will reflect the proxy, not the site.
@@ -44,7 +53,8 @@ python3 scan.py --batch sites.txt --json    # JSON array
 
 ## Roadmap
 
-- **M2** scoring (0–40) + one-page PDF report
+- **M1** passive engine — done
+- **M2** scoring (0–40) + one-page HTML/PDF report — done
 - **M3** AI privacy-policy reader (purpose, grievance officer, retention, itemised consent)
 - **M3b** form consent detection (Playwright)
 - **M4** FastAPI wrapper → **M5** Next.js front end → **M6** deploy free tier

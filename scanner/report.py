@@ -7,14 +7,12 @@ def mark(p) -> str:
     return _MARK[p]
 
 
-def render(result: dict) -> str:
+def render(result: dict, scored: dict = None) -> str:
     c = result["checks"]
-    lines = [
-        "",
-        f"VelaMed passive scan — {result['target']}",
-        f"scanned at {result['scanned_at']}",
-        "",
-    ]
+    lines = ["", f"VelaMed passive scan — {result['target']}"]
+    if scored:
+        lines.append(f"score {scored['score']}/{scored['max']} — {scored['band']}")
+    lines += [f"scanned at {result['scanned_at']}", ""]
 
     h = c["https_reachable"]
     lines.append(f"  [{mark(h['pass'])}] HTTPS reachable   — {h['detail']}")
@@ -36,9 +34,10 @@ def render(result: dict) -> str:
     return "\n".join(lines)
 
 
-def summary_line(result: dict) -> str:
+def summary_line(result: dict, scored: dict = None) -> str:
     """One compact line per site — used by the batch runner."""
     c = result["checks"]
+    prefix = f"{scored['score']:>2}/{scored['max']}  " if scored else ""
     flags = []
     if c["https_reachable"]["pass"] is not True:
         flags.append("no-https")
@@ -50,4 +49,4 @@ def summary_line(result: dict) -> str:
     present = len(sh.get("present", {}))
     total = present + len(sh.get("missing", []))
     flags.append(f"headers {present}/{total}")
-    return f"{result['host']:<32}  {', '.join(flags)}"
+    return f"{prefix}{result['host']:<32}  {', '.join(flags)}"
