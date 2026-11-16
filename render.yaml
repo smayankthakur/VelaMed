@@ -1,0 +1,16 @@
+# Render blueprint for the VelaMed API (FastAPI).
+# The service checks out the whole repo; main.py adds the repo root to sys.path
+# so the `scanner` package (at the repo root) imports even with rootDir set.
+services:
+  - type: web
+    name: velamed-api
+    runtime: python
+    rootDir: apps/api
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.3"
