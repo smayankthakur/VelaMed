@@ -28,6 +28,10 @@ export default function Privacy() {
         </p>
 
         <h2 style={{ fontSize: 18, marginTop: 24 }}>What we collect, and why</h2>
+        <p>
+          We collect the following information only for the purpose of providing the check you
+          requested and sending you the report — nothing else.
+        </p>
         <ul>
           <li>
             <strong>The website address you enter</strong> — used only to run a one-time passive
