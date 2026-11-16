@@ -80,8 +80,22 @@ def write_pdf(result: dict, scored: dict, path: str) -> str:
     c.setLineWidth(0.6)
     c.line(left, y, right, y)
 
-    # Rows
+    # Rows, grouped by Security / DPDP
+    group = None
     for item in scored["items"]:
+        if item["group"] != group:
+            group = item["group"]
+            gpts = sum(i["points"] for i in scored["items"] if i["group"] == group)
+            gmax = sum(i["max"] for i in scored["items"] if i["group"] == group)
+            y -= 20
+            c.setFillColor(blue)
+            c.setFont("Helvetica-Bold", 9)
+            c.drawString(left, y, group.upper())
+            c.drawRightString(right, y, f"{gpts}/{gmax}")
+            y -= 4
+            c.setStrokeColor(rule)
+            c.line(left, y, right, y)
+
         y -= 18
         full = item["points"] == item["max"]
         none = item["points"] == 0

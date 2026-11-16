@@ -2,10 +2,10 @@
 
 from .engine import scan, normalize, hostname_of
 from .scoring import score_scan, MAX_SCORE
-from . import checks, report, report_html, report_pdf
+from . import checks, dpdp, report, report_html, report_pdf
 
 __all__ = [
     "scan", "normalize", "hostname_of",
     "score_scan", "MAX_SCORE",
-    "checks", "report", "report_html", "report_pdf",
+    "checks", "dpdp", "report", "report_html", "report_pdf",
 ]

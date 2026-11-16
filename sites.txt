@@ -1,6 +1,10 @@
 # VelaMed — target list for batch scanning.
 # One site per line. Lines starting with # are ignored.
-# Replace these with the 10–15 Delhi NCR nursing homes you want to check.
+# Replace / extend with the 10–15 Delhi NCR nursing homes you want to check.
+#
+# Real small-hospital sites found while testing the rubric (examples):
+apexhospitali.netlify.app
+actionhospital.in
+parkhospital.in
 
-github.com
-example.com
+# Add your own local targets below:

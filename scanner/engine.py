@@ -8,9 +8,9 @@ This JSON is the contract every later layer builds on (scoring, report, API).
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
-from . import checks
+from . import checks, dpdp
 
-SCANNER_VERSION = "velamed-passive/0.1 (milestone-1)"
+SCANNER_VERSION = "velamed-passive/0.2 (milestone-3)"
 
 
 def normalize(url: str) -> str:
@@ -40,5 +40,7 @@ def scan(url: str, timeout: int = checks.DEFAULT_TIMEOUT) -> dict:
             "http_redirect": checks.check_http_redirect(host, timeout),
             "certificate": checks.check_certificate(host, timeout),
             "security_headers": checks.check_security_headers(url, timeout),
+            "privacy_policy": dpdp.check_privacy_policy(url, timeout),
+            "form_consent": dpdp.check_form_consent(url, timeout),
         },
     }

@@ -15,7 +15,8 @@ velamed/
 ├── scanner/           the passive engine (the product's core)
 │   ├── checks.py      individual passive checks
 │   ├── engine.py      scan() — runs the checks, returns JSON
-│   ├── scoring.py     0–40 rubric → score, band, breakdown
+│   ├── dpdp.py        DPDP checks: privacy policy + form consent
+│   ├── scoring.py     0–40 rubric (Security 24 / DPDP 16)
 │   ├── report.py      console / batch rendering
 │   ├── report_html.py one-page print-ready HTML report
 │   └── report_pdf.py  one-page PDF report (reportlab)
@@ -43,20 +44,32 @@ falls back to HTML, which prints to PDF from any browser.
 > Run it on a normal machine, not behind a TLS-intercepting proxy, or the
 > certificate and header readings will reflect the proxy, not the site.
 
-## What it checks (Milestone 1)
+## What it checks
 
+**Security (24 points)**
 - HTTPS reachable on port 443
 - HTTP redirects to HTTPS
 - TLS certificate validity + days to expiry (warn < 30 days, fail < 7)
 - Security headers: HSTS, CSP, X-Frame-Options, X-Content-Type-Options,
   Referrer-Policy, Permissions-Policy
 
+**DPDP (16 points)**
+- Privacy policy: present, and names the purpose of collection, a grievance
+  officer, and a retention period
+- Form consent: forms collecting personal data (name/phone/email) offer a
+  consent checkbox or privacy link, rather than collecting silently
+
+The privacy-policy reader uses a zero-cost heuristic by default (keyword/section
+matching, offline). To use an LLM instead, pass an `analyzer(text)->dict`
+callable to `dpdp.check_privacy_policy`. A *public privacy policy* is fine to
+send to a model; **patient data is not** — keep it off free tiers.
+
 ## Roadmap
 
 - **M1** passive engine — done
 - **M2** scoring (0–40) + one-page HTML/PDF report — done
-- **M3** AI privacy-policy reader (purpose, grievance officer, retention, itemised consent)
-- **M3b** form consent detection (Playwright)
+- **M3** DPDP checks: privacy-policy reader + form consent — done
+- **M3b** JS-rendered form consent via Playwright (for sites whose forms load via JS)
 - **M4** FastAPI wrapper → **M5** Next.js front end → **M6** deploy free tier
 - Paid tier (ownership gate + scanner worker + billing) — separate sprint
 

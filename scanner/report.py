@@ -14,22 +14,21 @@ def render(result: dict, scored: dict = None) -> str:
         lines.append(f"score {scored['score']}/{scored['max']} — {scored['band']}")
     lines += [f"scanned at {result['scanned_at']}", ""]
 
-    h = c["https_reachable"]
-    lines.append(f"  [{mark(h['pass'])}] HTTPS reachable   — {h['detail']}")
+    if scored:
+        group = None
+        for item in scored["items"]:
+            if item["group"] != group:
+                group = item["group"]
+                lines.append(f"  {group}")
+            chk = c.get(item["key"], {})
+            lines.append(f"    [{mark(chk.get('pass'))}] {item['label']:<22} "
+                         f"{item['points']}/{item['max']}  — {item['note']}")
+        lines.append("")
+        return "\n".join(lines)
 
-    r = c["http_redirect"]
-    lines.append(f"  [{mark(r['pass'])}] HTTP -> HTTPS     — {r['detail']}")
-
-    cert = c["certificate"]
-    lines.append(f"  [{mark(cert['pass'])}] TLS certificate   — {cert['detail']}")
-    if "issuer" in cert:
-        lines.append(f"         issuer: {cert['issuer']}, expires {cert.get('expires')}")
-
-    sh = c["security_headers"]
-    lines.append(f"  [{mark(sh['pass'])}] Security headers  — {sh['detail']}")
-    for m in sh.get("missing", []):
-        lines.append(f"         missing: {m['header']} ({m['note']})")
-
+    # Fallback without scoring: list whatever checks exist.
+    for key, chk in c.items():
+        lines.append(f"  [{mark(chk.get('pass'))}] {key} — {chk.get('detail', '')}")
     lines.append("")
     return "\n".join(lines)
 
@@ -49,4 +48,8 @@ def summary_line(result: dict, scored: dict = None) -> str:
     present = len(sh.get("present", {}))
     total = present + len(sh.get("missing", []))
     flags.append(f"headers {present}/{total}")
+    if c.get("privacy_policy", {}).get("pass") is not True:
+        flags.append("policy")
+    if c.get("form_consent", {}).get("pass") is False:
+        flags.append("no-consent")
     return f"{prefix}{result['host']:<32}  {', '.join(flags)}"

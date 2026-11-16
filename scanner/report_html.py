@@ -27,7 +27,17 @@ def build_html(result: dict, scored: dict) -> str:
     host = html.escape(result["host"])
     pct = round(scored["score"] / scored["max"] * 100)
     generated = datetime.now(timezone.utc).strftime("%d %b %Y")
-    rows = "".join(_row(i) for i in scored["items"])
+
+    rows, group = [], None
+    for item in scored["items"]:
+        if item["group"] != group:
+            group = item["group"]
+            gpts = sum(i["points"] for i in scored["items"] if i["group"] == group)
+            gmax = sum(i["max"] for i in scored["items"] if i["group"] == group)
+            rows.append(f'<tr class="grp"><td colspan="3">{html.escape(group)}</td>'
+                        f'<td class="pts">{gpts}/{gmax}</td></tr>')
+        rows.append(_row(item))
+    rows = "".join(rows)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -57,6 +67,8 @@ def build_html(result: dict, scored: dict) -> str:
   .mark {{ width: 24px; font-weight: 700; text-align: center; }}
   .note {{ color: #424a53; }}
   .pts {{ text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; width: 56px; }}
+  tr.grp td {{ background: #f6f8fa; font-weight: 700; font-size: 11px; text-transform: uppercase;
+              letter-spacing: .5px; color: #0b5cad; padding: 6px 8px; border-bottom: 1px solid #d0d7de; }}
   .foot {{ margin-top: 22px; font-size: 11px; color: #656d76; border-top: 1px solid #eaeef2;
           padding-top: 12px; }}
 </style>
