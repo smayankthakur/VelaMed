@@ -22,7 +22,8 @@ velamed/
 │   ├── report_html.py one-page print-ready HTML report
 │   └── report_pdf.py  one-page PDF report (reportlab)
 ├── apps/
-│   └── api/           FastAPI wrapper over the scanner (M4)
+│   ├── api/           FastAPI wrapper over the scanner (M4; live on Render)
+│   └── web/           Next.js front end (M5)
 └── reports/           (generated; git-ignored)
 ```
 
@@ -73,8 +74,14 @@ send to a model; **patient data is not** — keep it off free tiers.
 - **M3** DPDP checks: privacy-policy reader + form consent — done
 - **M3b** JS-rendered form consent via Playwright — done (optional; static fallback)
 - **M4** FastAPI wrapper — done (see `apps/api/`; live on Render)
-- **M5** Next.js front end → **M6** deploy free tier
+- **M5** Next.js front end — done (see `apps/web/`)
+- **M6** deploy the front end (Vercel) + lead-capture storage
 - Paid tier (ownership gate + scanner worker + billing) — separate sprint
+
+## Live
+
+- API: https://velamed-api.onrender.com (`/docs` for the interactive API)
+- Front end: `apps/web` — run locally or deploy to Vercel (M6)
 
 ## API
 
